@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::path::Path;
 
 #[cfg_attr(target_os = "linux", path = "linux.rs")]
 mod platform;
@@ -26,7 +27,11 @@ fn main() {
     );
 
     // Check if library exists
-    unimplemented!();
+    assert!(
+        Path::new(&args.library).exists(),
+        "The library '{}' does not exist.",
+        &args.library
+    );
 
     // Print some information about the library
     unimplemented!();
