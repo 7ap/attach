@@ -1,3 +1,18 @@
+use clap::Parser;
+
+/// Cross platform library injector written in Rust.
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+   /// Relative path to the target library
+   #[arg(short, long)]
+   library: String,
+
+   /// Name of the target process
+   #[arg(short, long)]
+   process: String,
+}
+
 fn main() {
-    println!("Hello, world!");
+    let args = Args::parse();
 }
