@@ -2,5 +2,7 @@
 name = "attach"
 version = "0.0.0"
 edition = "2021"
+description = "Cross platform library injector written in Rust."
+license = "MIT"
 
 [dependencies]
