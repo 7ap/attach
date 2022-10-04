@@ -1,5 +1,8 @@
 use clap::Parser;
 
+#[cfg_attr(target_os = "linux", path = "linux.rs")]
+mod platform;
+
 /// Cross platform library injector written in Rust.
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -17,7 +20,10 @@ fn main() {
     let args = Args::parse();
 
     // Check if we are root/admin
-    unimplemented!();
+    assert!(
+        platform::has_permissions(),
+        "You must run this program as root/administrator."
+    );
 
     // Check if library exists
     unimplemented!();
