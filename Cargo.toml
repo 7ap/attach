@@ -7,3 +7,6 @@ license = "MIT"
 
 [dependencies]
 clap = { version = "4.0.9", features = ["derive"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+nix = "0.25.0"
