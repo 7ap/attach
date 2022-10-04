@@ -33,13 +33,10 @@ fn main() {
         &args.library
     );
 
-    // Print some information about the library
-    unimplemented!();
-
     // Check if process exists
     unimplemented!();
 
-    // Print some information about the process
+    // Print some information about the library & process, maybe prompt the user if they *really* want to inject?
     unimplemented!();
 
     // Inject library into process
