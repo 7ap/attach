@@ -1,7 +1,7 @@
 use clap::Parser;
 
 /// Cross platform library injector written in Rust.
-#[derive(Parser, Debug)]
+#[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
    /// Path to the target library
