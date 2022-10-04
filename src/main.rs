@@ -4,13 +4,13 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-   /// Path to the target library
-   #[arg(short, long)]
-   library: String,
+    /// Path to the target library
+    #[arg(short, long)]
+    library: String,
 
-   /// Name of the target process
-   #[arg(short, long)]
-   process: String,
+    /// Name of the target process
+    #[arg(short, long)]
+    process: String,
 }
 
 fn main() {
