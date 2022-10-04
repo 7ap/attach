@@ -6,3 +6,4 @@ description = "Cross platform library injector written in Rust."
 license = "MIT"
 
 [dependencies]
+clap = { version = "4.0.9", features = ["derive"] }
