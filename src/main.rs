@@ -15,4 +15,22 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+
+    // Check if we are root/admin
+    unimplemented!();
+
+    // Check if library exists
+    unimplemented!();
+
+    // Print some information about the library
+    unimplemented!();
+
+    // Check if process exists
+    unimplemented!();
+
+    // Print some information about the process
+    unimplemented!();
+
+    // Inject library into process
+    unimplemented!();
 }
