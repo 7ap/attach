@@ -1,3 +1,3 @@
-# attach
+# 💉 attach
 
-Cross platform library injector written in Rust.
+Simple LoadLibrary DLL injector. 

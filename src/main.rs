@@ -1,44 +1,91 @@
+use std::ffi::*;
+use std::mem;
+use std::os::windows::process::CommandExt;
+use std::path::PathBuf;
+use std::process::Command;
+use std::thread;
+use std::time::Duration;
+
+use anyhow::Result;
 use clap::Parser;
-use std::path::Path;
+use windows::s;
+use windows::Win32::Foundation::*;
+use windows::Win32::System::Diagnostics::Debug::*;
+use windows::Win32::System::LibraryLoader::*;
+use windows::Win32::System::Memory::*;
+use windows::Win32::System::Threading::*;
 
-#[cfg_attr(target_os = "linux", path = "linux.rs")]
-mod platform;
-
-/// Cross platform library injector written in Rust.
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Path to the target library
+struct Cli {
     #[arg(short, long)]
-    library: String,
+    executable: PathBuf,
 
-    /// Name of the target process
     #[arg(short, long)]
-    process: String,
+    arguments: Option<String>,
+
+    #[arg(short, long)]
+    library: PathBuf,
+
+    #[arg(short, long)]
+    delay: Option<f32>,
 }
 
-fn main() {
-    let args = Args::parse();
+fn main() -> Result<()> {
+    let cli = Cli::parse();
+    let executable = cli.executable;
+    let arguments = cli.arguments;
+    let library = cli.library;
 
-    // Check if we are root/admin
-    assert!(
-        platform::has_permissions(),
-        "You must run this program as root/administrator."
-    );
+    let mut process = Command::new(executable);
 
-    // Check if library exists
-    assert!(
-        Path::new(&args.library).exists(),
-        "The library '{}' does not exist.",
-        &args.library
-    );
+    if let Some(arguments) = arguments {
+        process.raw_arg(arguments);
+    }
 
-    // Check if process exists
-    unimplemented!();
+    let process = process.spawn()?;
 
-    // Print some information about the library & process, maybe prompt the user if they *really* want to inject?
-    unimplemented!();
+    if let Some(delay) = cli.delay {
+        thread::sleep(Duration::from_secs_f32(delay));
+    }
 
-    // Inject library into process
-    unimplemented!();
+    unsafe {
+        let process = OpenProcess(PROCESS_ALL_ACCESS, false, process.id())?;
+
+        let kernel32 = GetModuleHandleA(s!("kernel32.dll"))?;
+        let load_library = GetProcAddress(kernel32, s!("LoadLibraryA")).unwrap();
+
+        let local_buffer = CString::new(library.canonicalize()?.to_str().unwrap())?;
+
+        let remote_buffer = VirtualAllocEx(
+            process,
+            None,
+            local_buffer.as_bytes().len(),
+            MEM_COMMIT | MEM_RESERVE,
+            PAGE_READWRITE,
+        );
+
+        WriteProcessMemory(
+            process,
+            remote_buffer,
+            local_buffer.as_ptr() as _,
+            local_buffer.as_bytes().len(),
+            None,
+        );
+
+        CreateRemoteThread(
+            process,
+            None,
+            0,
+            Some(mem::transmute(load_library)),
+            Some(remote_buffer),
+            0,
+            None,
+        )?;
+
+        thread::sleep(Duration::from_secs(1));
+        VirtualFreeEx(process, remote_buffer, 0, MEM_RELEASE);
+        CloseHandle(process);
+    }
+
+    Ok(())
 }
